@@ -10,8 +10,46 @@
       >
         Add User
       </button>
+
+      <!-- Toggle Grid/Table View -->
+      <div class="flex items-center space-x-4">
+        <button @click="toggleView" class="text-sm bg-gray-200 p-2 rounded">
+          {{ isGridView ? 'Switch to Table View' : 'Switch to Grid View' }}
+        </button>
+      </div>
     </div>
+
     <div v-if="loading" class="text-center text-gray-500">Loading...</div>
+
+    <!-- Grid View -->
+    <div v-if="!loading && isGridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-for="user in users"
+        :key="user.id"
+        class="border p-4 rounded-lg shadow hover:bg-gray-100 cursor-pointer"
+        @click="goToUserDetails(user.id)"
+      >
+        <h3 class="font-semibold text-lg">{{ user.name }}</h3>
+        <p class="text-sm text-gray-600">{{ user.phone }}</p>
+        <p class="text-sm text-gray-600">{{ user.email }}</p>
+        <div class="mt-2 flex justify-between">
+          <button
+            @click.stop="openEditModal(user)"
+            class="text-blue-500 hover:text-blue-700 font-semibold"
+          >
+            Edit
+          </button>
+          <button
+            @click.stop="deleteUser(user.id)"
+            class="text-red-500 hover:text-red-700 font-semibold"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table View -->
     <table v-else class="min-w-full bg-white border rounded-lg shadow">
       <thead>
         <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
@@ -48,67 +86,69 @@
         </tr>
       </tbody>
     </table>
-
-    <!-- Edit User Modal -->
-    <EditUserModal
-      :isOpen="isModalOpen"
-      :user="editingUser"
-      @close="closeModal"
-      @save="handleSaveUser"
-    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore, type User } from '@/stores/user'
-import EditUserModal from '@/components/forms/EditUserModal.vue'
+import { useUserStore } from '@/stores/userStore'
+import type { User } from '@/types/User'
 
 const userStore = useUserStore()
 const router = useRouter()
 const users = computed(() => userStore.users)
 const loading = computed(() => userStore.loading)
 
-const isModalOpen = ref(false)
-const editingUser = ref<User | null>(null)
+const isGridView = ref(false) // Track whether grid view is enabled
+
+const emit = defineEmits(['edit', 'delete'])
+
+// const isModalOpen = ref(false)
+// const editingUser = ref<User | null>(null)
 
 onMounted(() => {
-  if (!users.value.length) userStore.fetchUsers()
+  if (!users.value.length) userStore.loadUsers()
 })
+
+// Toggle the view between grid and table
+const toggleView = () => {
+  isGridView.value = !isGridView.value
+}
 
 function goToUserDetails(userId: number) {
   router.push({ name: 'UserDetails', params: { id: userId } })
 }
 
 function openAddModal() {
-  editingUser.value = { id: 0, name: '', phone: '', email: '' } // New user template
-  isModalOpen.value = true
+  // editingUser.value = { id: 0, name: '', phone: '', email: '' } // New user template
+  // isModalOpen.value = true
+  emit('edit', { id: 0, name: '', phone: '', email: '' })
 }
 
 function openEditModal(user: User) {
-  editingUser.value = user
-  isModalOpen.value = true
+  // editingUser.value = user
+  // isModalOpen.value = true
+  emit('edit', user)
 }
 
-function closeModal() {
-  isModalOpen.value = false
-}
+// function closeModal() {
+//   isModalOpen.value = false
+// }
 
-async function handleSaveUser(user: User) {
-  if (user.id === 0) {
-    // New user
-    await userStore.addUser(user)
-  } else {
-    // Existing user edit
-    await userStore.editUser(user)
-  }
-  closeModal()
-}
+// async function handleSaveUser(user: User) {
+//   if (user.id === 0) {
+//     // New user
+//     await userStore.addUser(user)
+//   } else {
+//     // Existing user edit
+//     await userStore.editUser(user)
+//   }
+//   closeModal()
+// }
 
 async function deleteUser(userId: number) {
-  await userStore.deleteUser(userId)
+  await userStore.removeUser(userId)
 }
 </script>
-
 <style scoped></style>

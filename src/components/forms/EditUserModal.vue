@@ -1,85 +1,81 @@
 <template>
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
-  >
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h2 class="text-lg font-bold mb-4">Edit User</h2>
-      <label class="block mb-3">
-        Name:
-        <input v-model="formData.name" class="border rounded p-2 mt-1 w-full" />
-      </label>
-      <label class="block mb-3">
-        Contact Number:
-        <input v-model="formData.phone" class="border rounded p-2 mt-1 w-full" />
-      </label>
-      <label class="block mb-3">
-        Email:
-        <input v-model="formData.email" class="border rounded p-2 mt-1 w-full" />
-      </label>
-      <div class="mt-4 flex justify-end">
-        <button
-          @click="closeModal"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 mr-2"
-        >
-          Cancel
-        </button>
-        <button
-          @click="saveEdit"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-        >
-          Save
-        </button>
-      </div>
+  <div class="modal-backdrop">
+    <div class="modal-content">
+      <form @submit.prevent="saveUser">
+        <h2>Edit User</h2>
+        <label>
+          Name:
+          <input v-model="userData.name" required />
+        </label>
+        <label>
+          Contact Number:
+          <input v-model="userData.phone" required />
+        </label>
+        <label>
+          Email:
+          <input v-model="userData.email" type="email" required />
+        </label>
+        <div class="modal-actions">
+          <button type="submit">Save</button>
+          <button type="button" @click="$emit('close')">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, ref, watch } from 'vue'
-import type { User } from '@/stores/user'
+import { ref, watch } from 'vue'
+import type { User } from '@/types/User'
 
-const props = defineProps<{
-  isOpen: boolean
+interface Props {
   user: User | null
-}>()
+}
 
-const emits = defineEmits<{
-  (e: 'close'): void
-  (e: 'save', user: User): void
-}>()
+const props = defineProps<Props>()
+const emit = defineEmits(['close', 'save'])
 
-// Set formData to a ref with a default value to prevent it from being null
-const formData = ref<User>({
-  id: 0,
-  name: '',
-  phone: '',
-  email: '',
-})
+const userData = ref({ ...props.user })
 
-// Watch for changes to the user prop and update formData accordingly
+// Watch for changes in the `user` prop to update `userData`
 watch(
   () => props.user,
   (newUser) => {
-    if (newUser) {
-      formData.value = { ...newUser }
-    }
+    userData.value = { ...newUser } // Clone the user to avoid mutating the prop directly
   },
   { immediate: true },
 )
 
-function closeModal() {
-  emits('close')
-}
-
-function saveEdit() {
-  if (formData.value) {
-    emits('save', formData.value)
-    closeModal()
-  }
+// Emit the `save` event with updated user data when the form is submitted
+function saveUser() {
+  emit('save', userData.value)
 }
 </script>
 
 <style scoped>
-/* Add any additional styling for the modal if needed */
+/* Basic styling for the modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
 </style>
