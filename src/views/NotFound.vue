@@ -1,4 +1,3 @@
-<!-- src/views/NotFound.vue -->
 <template>
   <div class="flex flex-col items-center justify-center h-screen text-center">
     <h1 class="text-4xl font-bold text-red-600">404</h1>
@@ -9,10 +8,6 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-// No specific logic needed for this simple view
-</script>
+<script lang="ts" setup></script>
 
-<style scoped>
-/* Additional custom styling if needed */
-</style>
+<style scoped></style>

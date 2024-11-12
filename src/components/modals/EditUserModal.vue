@@ -2,7 +2,9 @@
   <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
       <form @submit.prevent="saveUser">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Edit User</h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+          {{ userData.id === 0 ? 'Add' : 'Edit' }} User
+        </h2>
 
         <div class="mb-4">
           <label class="block text-gray-700 font-medium mb-1">Name:</label>

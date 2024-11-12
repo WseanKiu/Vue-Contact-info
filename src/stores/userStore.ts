@@ -17,14 +17,12 @@ export const useUserStore = defineStore('userStore', {
       this.loading = false
     },
     async addUser(newUser: User) {
-      // newUser.id = this.users.length + 1
       await addUser(newUser)
       this.users.push({ ...newUser, id: this.lastUserID + 1 })
       this.lastUserID = this.lastUserID + 1
     },
     async editUser(userId: number, updatedUser: User) {
-      console.log(userId, 'edit user')
-      if (userId <= 10) await updateUser(userId, updatedUser) // avoid unsupported id on jsonplaceholder
+      if (userId <= 10) await updateUser(userId, updatedUser) // avoid unsupported id based on jsonplaceholder
       const index = this.users.findIndex((user) => user.id === updatedUser.id)
       if (index !== -1) this.users[index] = updatedUser
     },

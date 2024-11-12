@@ -100,18 +100,13 @@ const router = useRouter()
 const users = computed(() => userStore.users)
 const loading = computed(() => userStore.loading)
 
-const isGridView = ref(false) // Track whether grid view is enabled
-
-const emit = defineEmits(['edit', 'delete'])
-
-// const isModalOpen = ref(false)
-// const editingUser = ref<User | null>(null)
+const isGridView = ref(false)
+const emit = defineEmits(['add', 'edit', 'delete'])
 
 onMounted(() => {
   if (!users.value.length) userStore.loadUsers()
 })
 
-// Toggle the view between grid and table
 const toggleView = () => {
   isGridView.value = !isGridView.value
 }
@@ -121,34 +116,16 @@ function goToUserDetails(userId: number) {
 }
 
 function openAddModal() {
-  // editingUser.value = { id: 0, name: '', phone: '', email: '' } // New user template
-  // isModalOpen.value = true
-  emit('edit', { id: 0, name: '', phone: '', email: '' })
+  emit('add')
 }
 
 function openEditModal(user: User) {
-  // editingUser.value = user
-  // isModalOpen.value = true
   emit('edit', user)
 }
-
-// function closeModal() {
-//   isModalOpen.value = false
-// }
-
-// async function handleSaveUser(user: User) {
-//   if (user.id === 0) {
-//     // New user
-//     await userStore.addUser(user)
-//   } else {
-//     // Existing user edit
-//     await userStore.editUser(user)
-//   }
-//   closeModal()
-// }
 
 async function deleteUser(userId: number) {
   await userStore.removeUser(userId)
 }
 </script>
+
 <style scoped></style>

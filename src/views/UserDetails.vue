@@ -69,6 +69,9 @@ onMounted(async () => {
   if (userStore.users.length === 0) {
     await userStore.loadUsers()
   }
+  if (todoStore.todos.length === 0) {
+    await todoStore.loadTodos()
+  }
 
   // Find the user after ensuring data is loaded
   user.value = userStore.users.find((u) => u.id === userId) || null
@@ -76,11 +79,6 @@ onMounted(async () => {
   if (!user.value) {
     console.warn('User not found')
     return router.push({ name: 'NotFound' })
-  }
-
-  // Load todos if they haven't been loaded yet
-  if (todoStore.todos.length === 0) {
-    await todoStore.loadTodos()
   }
 })
 
@@ -92,8 +90,6 @@ const addNewTodo = () => {
       title: newTodoTitle.value,
       completed: false,
     }
-
-    // Add the new todo to the store
     todoStore.addTodo(newTodo)
 
     // Reset input field

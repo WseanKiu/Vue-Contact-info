@@ -13,19 +13,13 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/userStore'
-// import { useTodoStore } from '@/stores/todoStore'
 import type { User } from '@/types/User'
 import UserList from '@/components/UserList.vue'
 import EditUserModal from '@/components/modals/EditUserModal.vue'
 
 const userStore = useUserStore()
-// const todoStore = useTodoStore()
-
-// State variables to manage the edit modal and selected user
 const isEditModalOpen = ref(false)
 const selectedUser = ref<User | null>(null)
-console.log('123123')
-// Fetch users when component mounts
 onMounted(() => {
   if (!userStore.users.length) userStore.loadUsers()
   // if (!todoStore.todos.length) todoStore.loadTodos()
@@ -49,7 +43,6 @@ function handleEditUser(user: User) {
   console.log('isEditModalOpen:', isEditModalOpen.value)
 }
 
-// Save the edited user data
 async function handleSaveUser(user: User) {
   if (user.id === 0) {
     // New user
@@ -71,6 +64,4 @@ function handleDeleteUser(userId: number) {
 }
 </script>
 
-<style scoped>
-/* Additional styling if needed */
-</style>
+<style scoped></style>
